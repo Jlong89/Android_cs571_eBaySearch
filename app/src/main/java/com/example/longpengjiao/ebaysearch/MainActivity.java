@@ -8,9 +8,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    private String keywords;
+    private String minPrice;
+    private String maxPrice;
+    private String sortBy;
+
+    EditText keywordTextField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +30,7 @@ public class MainActivity extends ActionBarActivity {
                     .add(R.id.container, new SearchFragment())
                     .commit();
         }
+
     }
 
 
@@ -60,5 +70,11 @@ public class MainActivity extends ActionBarActivity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             return rootView;
         }
+    }
+
+    private void checkForm(){
+        keywordTextField  =(EditText) findViewById(R.id.keywords_field);
+        keywords = keywordTextField.getText().toString();
+        Toast.makeText(this, keywords, Toast.LENGTH_SHORT).show();
     }
 }

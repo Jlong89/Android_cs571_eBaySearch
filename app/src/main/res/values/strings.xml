@@ -11,6 +11,10 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_label">Search</string>
     <string name="clear_label">Clear</string>
+    <string name="invalid_keywords">Please enter a keyword</string>
+    <string name="invalid_minPrice">Min price must be a positive decimal</string>
+    <string name="invalid_maxPrice">Max price must be a positive decimal</string>
+    <string name="invalid_min_max"> Max price must not be less than min price</string>
 
     <string-array name="sortBy_options_array">
         <item>Best Match</item>

@@ -106,7 +106,49 @@
         android:layout_toRightOf="@id/clearButton"
         android:layout_alignBottom="@id/clearButton"
         android:layout_alignTop="@id/clearButton"
-        android:layout_marginLeft="5dp"/>
+        android:layout_marginLeft="5dp"
+       />
+
+    <TextView android:id="@+id/invalid_keywords"
+        android:text="@string/invalid_keywords"
+        android:layout_width="wrap_content"
+        android:textSize="23sp"
+        android:textColor="#F23838"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/clearButton"
+        android:layout_centerHorizontal="true" />
+
+    <TextView android:id="@+id/invalid_minPrice"
+        android:text="@string/invalid_minPrice"
+        android:layout_width="wrap_content"
+        android:textSize="23sp"
+        android:textColor="#F23838"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/clearButton"
+        android:layout_centerHorizontal="true" />
+
+
+    <TextView android:id="@+id/invalid_maxPrice"
+        android:text="@string/invalid_maxPrice"
+        android:layout_width="wrap_content"
+        android:textSize="23sp"
+        android:textColor="#F23838"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/clearButton"
+        android:layout_centerHorizontal="true" />
+
+    <TextView android:id="@+id/invalid_min_max"
+        android:text="@string/invalid_min_max"
+        android:layout_width="wrap_content"
+        android:textSize="23sp"
+        android:textColor="#F23838"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/clearButton"
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>
