@@ -1,7 +1,10 @@
 package com.example.longpengjiao.ebaysearch;
 
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +14,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,18 +31,18 @@ public class SearchFragment extends Fragment {
     private String maxPrice;
     private String sortBy;
 
-    float minPriceVal;
-    float maxPriceVal;
+    private float minPriceVal;
+    private float maxPriceVal;
 
-    EditText keywordTextField;
-    EditText minPriceTextField;
-    EditText maxPriceTextField;
+    private  EditText keywordTextField;
+    private EditText minPriceTextField;
+    private EditText maxPriceTextField;
 
-    TextView invalid_keyword_text;
-    TextView invalid_minPrice_text;
-    TextView invalid_maxPrice_text;
-    TextView invalid_min_max_text;
-    Pattern p = Pattern.compile("^\\d+(\\.\\d+)?$");
+    private TextView invalid_keyword_text;
+    private TextView invalid_minPrice_text;
+    private TextView invalid_maxPrice_text;
+    private TextView invalid_min_max_text;
+    private Pattern p = Pattern.compile("^\\d+(\\.\\d+)?$");
 
     public SearchFragment() {
         // Required empty public constructor
@@ -118,16 +127,111 @@ public class SearchFragment extends Fragment {
                 invalid_maxPrice_text.setVisibility(View.GONE);
             }
         }
+        if(minPrice.length()!=0 && maxPrice.length()!=0) {
+            minPriceVal = Float.parseFloat(minPrice);
+            maxPriceVal = Float.parseFloat(maxPrice);
 
-        minPriceVal=Float.parseFloat(minPrice);
-        maxPriceVal=Float.parseFloat(maxPrice);
+            if (maxPriceVal < minPriceVal) {
+                invalid_min_max_text.setVisibility(View.VISIBLE);
+                return;
+            } else {
+                invalid_min_max_text.setVisibility(View.GONE);
+            }
+        }
 
-        if(maxPriceVal<minPriceVal){
-            invalid_min_max_text.setVisibility(View.VISIBLE);
-            return;
-        }else{
-            invalid_min_max_text.setVisibility(View.GONE);
+        makeCall();
+    }
+
+    private void makeCall(){
+        FetchEbayResults ebayTask = new FetchEbayResults();
+        ebayTask.execute();
+    }
+
+
+    public class FetchEbayResults extends AsyncTask<String, Void, String> {
+
+        private final String LOG_TAG = FetchEbayResults.class.getSimpleName();
+
+        @Override
+        protected String doInBackground(String... params) {
+            //HTTP request to HW8 php on amazon
+
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+            try {
+                urlConnection = null;
+                reader = null;
+
+                //raw JSON string as response
+                String resultsJsonStr = null;
+
+                final String EBAY_BASE_URL = "http://hw8ebaysearch-env.elasticbeanstalk.com/HW8.php?";
+
+                final String KEYWORDS_PARAM = "keywords";
+                final String MINPRICE_PARAM = "min_price";
+                final String MAXPRICE_PARAM = "max_price";
+                final String SORTYBY_PARAM = "sortby";
+                final String RESULTS_PER_PAGE_PARAM = "results_per_page";
+                final String PAGE_NUM = "pageNum";
+
+                //build URL to call PHP
+                Uri builtUri = Uri.parse(EBAY_BASE_URL).buildUpon()
+                        .appendQueryParameter(KEYWORDS_PARAM, keywords)
+                        .appendQueryParameter(MINPRICE_PARAM, minPrice)
+                        .appendQueryParameter(MAXPRICE_PARAM, maxPrice)
+                        .appendQueryParameter(RESULTS_PER_PAGE_PARAM, "5")
+                        .appendQueryParameter(PAGE_NUM, "1")
+                        .appendQueryParameter(SORTYBY_PARAM, sortBy).build();
+
+
+                URL url = new URL(builtUri.toString());
+                //make URL connection
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+
+                //Read Response
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    return null;
+                }
+
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    return null;
+                }
+
+                resultsJsonStr = buffer.toString();
+                Log.v(LOG_TAG, "result json string: " + resultsJsonStr);
+
+                return resultsJsonStr;
+
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Error", e);
+                return null;
+            }  finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(LOG_TAG, "Error closing stream", e);
+                    }
+                }
+            }
         }
     }
+
 
 }
