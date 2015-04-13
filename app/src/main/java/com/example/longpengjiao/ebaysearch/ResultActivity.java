@@ -1,7 +1,6 @@
 package com.example.longpengjiao.ebaysearch;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -16,8 +15,6 @@ import android.widget.ListView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,8 +83,10 @@ public class ResultActivity extends ActionBarActivity {
                 if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
                     jsonResult = intent.getStringExtra(Intent.EXTRA_TEXT);
                 }
+                //obtain results from JSON
                 getResultsFromJson(jsonResult);
-                ResultListAdapter resultAdapter=new ResultListAdapter(getActivity(),itemTitleList,galleryURLList,itemPriceStrList);
+                //set the custom adapter to populate the results listview
+                ResultListAdapter resultAdapter=new ResultListAdapter(getActivity(),itemTitleList,galleryURLList,itemPriceStrList,items);
                 ListView resultList= (ListView) rootView.findViewById(R.id.result_list);
                 resultList.setAdapter(resultAdapter);
             }
@@ -166,15 +165,7 @@ public class ResultActivity extends ActionBarActivity {
             //Toast.makeText(getActivity(), test, Toast.LENGTH_SHORT).show();
 
         }
-        public static Drawable loadImageFromURL(String url) {
-            try {
-                InputStream is = (InputStream) new URL(url).getContent();
-                Drawable d = Drawable.createFromStream(is, "src name");
-                return d;
-            } catch (Exception e) {
-                return null;
-            }
-        }
+
 
     }
 
