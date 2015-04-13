@@ -1,5 +1,6 @@
 package com.example.longpengjiao.ebaysearch;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -165,7 +166,7 @@ public class SearchFragment extends Fragment {
                 //raw JSON string as response
                 String resultsJsonStr = null;
 
-                final String EBAY_BASE_URL = "http://hw8ebaysearch-env.elasticbeanstalk.com/HW8.php?";
+                final String EBAY_BASE_URL = "http://hw9ebaysearch-env.elasticbeanstalk.com/?";
 
                 final String KEYWORDS_PARAM = "keywords";
                 final String MINPRICE_PARAM = "min_price";
@@ -229,6 +230,17 @@ public class SearchFragment extends Fragment {
                         Log.e(LOG_TAG, "Error closing stream", e);
                     }
                 }
+            }
+        }
+
+
+        @Override
+        public void onPostExecute(String result){
+            if(result!=null){
+                //start new dislayResult activity
+                Intent resultIntent = new Intent(getActivity(), ResultActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, result);
+                startActivity(resultIntent);
             }
         }
     }

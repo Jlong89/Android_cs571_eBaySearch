@@ -23,4 +23,7 @@
         <item>Price + Shipping: lowest first</item>
     </string-array>
 
+    <string name="title_activity_result">ResultActivity</string>
+    <string name="hello_world">Hello world!</string>
+
 </resources>
