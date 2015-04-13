@@ -1,6 +1,7 @@
 package com.example.longpengjiao.ebaysearch;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -10,11 +11,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.ListView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +67,11 @@ public class ResultActivity extends ActionBarActivity {
         private static final String LOG_TAG = ResultsFragment.class.getSimpleName();
         private String jsonResult;
 
+        private ArrayList<String> itemTitleList = new ArrayList<>();
+        private ArrayList<String> itemPriceStrList = new ArrayList<>();
+        private ArrayList<String> galleryURLList = new ArrayList<>();
+        private String shippingCost=null;
+
         //collect json results into arraylist, each element contains item information
         private ArrayList<Map<String, String>> items = new ArrayList<>();
         public ResultsFragment() {
@@ -78,8 +86,10 @@ public class ResultActivity extends ActionBarActivity {
                 if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
                     jsonResult = intent.getStringExtra(Intent.EXTRA_TEXT);
                 }
-
                 getResultsFromJson(jsonResult);
+                ResultListAdapter resultAdapter=new ResultListAdapter(getActivity(),itemTitleList,galleryURLList,itemPriceStrList);
+                ListView resultList= (ListView) rootView.findViewById(R.id.result_list);
+                resultList.setAdapter(resultAdapter);
             }
             catch(JSONException e){
                 Log.e(LOG_TAG, "Error", e);
@@ -107,11 +117,25 @@ public class ResultActivity extends ActionBarActivity {
 
                 Map<String, String> curItem = new HashMap<>();
                 curItem.put("title", basicInfoJsonObj.getString("Title"));
+                String itemTitle = basicInfoJsonObj.getString("Title");
+                itemTitleList.add(itemTitle);
+
                 curItem.put("galleryURL", basicInfoJsonObj.getString("galleryURL"));
+                //Drawable itemImg = loadImageFromURL(basicInfoJsonObj.getString("galleryURL"));
+                galleryURLList.add(basicInfoJsonObj.getString("galleryURL"));
                 curItem.put("viewItemURL", basicInfoJsonObj.getString("viewItemURL"));
                 curItem.put("pictureURLSuperSize", basicInfoJsonObj.getString("pictureURLSuperSize"));
                 curItem.put("convertedCurrentPrice", basicInfoJsonObj.getString("convertedCurrentPrice"));
+                String priceStr = "Price: $"+basicInfoJsonObj.getString("convertedCurrentPrice");
                 curItem.put("shippingServiceCost", basicInfoJsonObj.getString("shippingServiceCost"));
+                shippingCost = basicInfoJsonObj.getString("shippingServiceCost");
+                if(shippingCost.equals("") || Float.parseFloat(shippingCost)==0.0){
+                    priceStr += " (FREE Shipping)";
+                }else{
+                    priceStr += "(+ $"+priceStr+"Shipping )";
+                }
+                itemPriceStrList.add(priceStr);
+                curItem.put("priceStr", priceStr);
                 curItem.put("conditionDisplayName", basicInfoJsonObj.getString("conditionDisplayName"));
                 curItem.put("listingType", basicInfoJsonObj.getString("listingType"));
                 curItem.put("location", basicInfoJsonObj.getString("shipLocation"));
@@ -139,8 +163,19 @@ public class ResultActivity extends ActionBarActivity {
             }
 
              String test = items.get(4).get("location");
-            Toast.makeText(getActivity(), test, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), test, Toast.LENGTH_SHORT).show();
+
         }
+        public static Drawable loadImageFromURL(String url) {
+            try {
+                InputStream is = (InputStream) new URL(url).getContent();
+                Drawable d = Drawable.createFromStream(is, "src name");
+                return d;
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
     }
 
 }
