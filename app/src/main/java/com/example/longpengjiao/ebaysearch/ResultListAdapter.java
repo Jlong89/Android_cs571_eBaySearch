@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Created by longpengjiao on 4/12/15.
@@ -28,10 +28,11 @@ public class ResultListAdapter extends ArrayAdapter<String> {
     private final ArrayList<String> itemTitlesList;
     private final ArrayList<String> itemPricesList;
     private final ArrayList<String> itemImagesURLList;
-    private final ArrayList<Map<String, String>> itemsArr;
+    private final ArrayList<HashMap<String, String>> itemsArr;
+    private HashMap<String, String> itemMap;
 
 
-    public ResultListAdapter(Activity context, ArrayList<String> titles, ArrayList<String> imageURLs, ArrayList<String> prices, ArrayList<Map<String, String>> itemsInfoArr) {
+    public ResultListAdapter(Activity context, ArrayList<String> titles, ArrayList<String> imageURLs, ArrayList<String> prices, ArrayList<HashMap<String, String>> itemsInfoArr) {
         super(context, R.layout.results_row, titles);
         // TODO Auto-generated constructor stub
 
@@ -40,7 +41,6 @@ public class ResultListAdapter extends ArrayAdapter<String> {
         this.itemImagesURLList=imageURLs;
         this.itemPricesList = prices;
         this.itemsArr = itemsInfoArr;
-
     }
 
     public View getView(int position,View view, ViewGroup parent) {
@@ -54,7 +54,7 @@ public class ResultListAdapter extends ArrayAdapter<String> {
         title.setText(itemTitlesList.get(position));
         String imgURL = itemImagesURLList.get(position);
 
-        Map<String, String> itemMap = itemsArr.get(position);
+        itemMap = itemsArr.get(position);
         String viewItemURL = itemMap.get("viewItemURL");
 
         DownloadImageTask dlImgTask = new DownloadImageTask(imageView);
@@ -63,10 +63,12 @@ public class ResultListAdapter extends ArrayAdapter<String> {
 
         //imageView.setImageDrawable(itemImagesList.get(position));
         price.setText(itemPricesList.get(position));
+
+        //make title clickable and start new DetailsActivity
+        SetTitleAction st = new SetTitleAction(context, title, itemsArr.get(position));
+        st.setAction();
         return rowView;
-
     }
-
 
     /*
         Async task used to download images from urls and assign them to an imageView
@@ -100,8 +102,6 @@ public class ResultListAdapter extends ArrayAdapter<String> {
             return mIcon11;
         }
 
-
-
         protected void onPostExecute(Bitmap result) {
             bmImage.setImageBitmap(result);
 
@@ -109,13 +109,41 @@ public class ResultListAdapter extends ArrayAdapter<String> {
             bmImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // open the desired ebay page
+                    // open the desired ebay page with intent
                     Intent i = new Intent(Intent.ACTION_VIEW);
                     i.setData(Uri.parse(itemEbayURL));
-
                     mContext.startActivity(i);
                 }
             });
         }
+
+
+    }
+
+    /*
+        Make title in TextView clickable to start a DetailsActivity and item Info for populating
+     */
+    private class SetTitleAction{
+        private final HashMap<String, String> itemInfo;
+        private final TextView title;
+        private final Context context;
+
+        protected SetTitleAction(Context context, TextView title, HashMap<String, String> itemInfo){
+            this.title = title;
+            this.context = context;
+            this.itemInfo = itemInfo;
+        }
+
+        protected void setAction() {
+            title.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent detailsIntent = new Intent(context, DetailsActivity.class)
+                            .putExtra("itemInfo", itemInfo);
+                    context.startActivity(detailsIntent);
+                }
+            });
+        }
+
     }
 }

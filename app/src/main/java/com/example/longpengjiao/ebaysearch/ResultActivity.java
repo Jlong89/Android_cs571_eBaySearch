@@ -17,7 +17,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 
 public class ResultActivity extends ActionBarActivity {
@@ -70,7 +69,7 @@ public class ResultActivity extends ActionBarActivity {
         private String shippingCost=null;
 
         //collect json results into arraylist, each element contains item information
-        private ArrayList<Map<String, String>> items = new ArrayList<>();
+        private ArrayList<HashMap<String, String>> items = new ArrayList<>();
         public ResultsFragment() {
         }
 
@@ -114,7 +113,7 @@ public class ResultActivity extends ActionBarActivity {
                 JSONObject itemJsonObj = resultsJson.getJSONObject(itemNo);
                 JSONObject basicInfoJsonObj = itemJsonObj.getJSONObject("basicInfo");
 
-                Map<String, String> curItem = new HashMap<>();
+                HashMap<String, String> curItem = new HashMap<>();
                 curItem.put("title", basicInfoJsonObj.getString("Title"));
                 String itemTitle = basicInfoJsonObj.getString("Title");
                 itemTitleList.add(itemTitle);
@@ -131,7 +130,7 @@ public class ResultActivity extends ActionBarActivity {
                 if(shippingCost.equals("") || Float.parseFloat(shippingCost)==0.0){
                     priceStr += " (FREE Shipping)";
                 }else{
-                    priceStr += "(+ $"+priceStr+"Shipping )";
+                    priceStr += "(+$"+basicInfoJsonObj.getString("shippingServiceCost")+" Shipping )";
                 }
                 itemPriceStrList.add(priceStr);
                 curItem.put("priceStr", priceStr);

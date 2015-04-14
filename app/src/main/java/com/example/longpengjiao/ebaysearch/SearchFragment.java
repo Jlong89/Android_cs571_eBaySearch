@@ -15,6 +15,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +41,7 @@ public class SearchFragment extends Fragment {
     private  EditText keywordTextField;
     private EditText minPriceTextField;
     private EditText maxPriceTextField;
-
+    private TextView invalid_noResults;
     private TextView invalid_keyword_text;
     private TextView invalid_minPrice_text;
     private TextView invalid_maxPrice_text;
@@ -59,6 +62,7 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_search, container, false);
+
         Spinner spinner = (Spinner) rootView.findViewById(R.id.sortBy_spinner);
     // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
@@ -76,6 +80,11 @@ public class SearchFragment extends Fragment {
             }
         });
 
+
+
+        invalid_noResults = (TextView)rootView.findViewById(R.id.invalid_noResults);
+        invalid_noResults.setVisibility(View.GONE);
+
         invalid_keyword_text  =(TextView) rootView.findViewById(R.id.invalid_keywords);
         invalid_keyword_text.setVisibility(View.GONE);
         invalid_minPrice_text  =(TextView) rootView.findViewById(R.id.invalid_minPrice);
@@ -89,6 +98,15 @@ public class SearchFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        invalid_noResults.setVisibility(View.GONE);
+    }
+
+    /*
+        called when search button is pressed to check valid form fields
+     */
     private void checkForm(){
         keywordTextField  =(EditText) getActivity().findViewById(R.id.keywords_field);
         keywords = keywordTextField.getText().toString();
@@ -155,8 +173,8 @@ public class SearchFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... params) {
-            //HTTP request to HW8 php on amazon
-
+            
+            //HTTP request to HW9  index.php on amazon
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             try {
@@ -166,8 +184,8 @@ public class SearchFragment extends Fragment {
                 //raw JSON string as response
                 String resultsJsonStr = null;
 
+                //strings for building url
                 final String EBAY_BASE_URL = "http://hw9ebaysearch-env.elasticbeanstalk.com/?";
-
                 final String KEYWORDS_PARAM = "keywords";
                 final String MINPRICE_PARAM = "min_price";
                 final String MAXPRICE_PARAM = "max_price";
@@ -235,12 +253,24 @@ public class SearchFragment extends Fragment {
 
 
         @Override
-        public void onPostExecute(String result){
-            if(result!=null){
-                //start new dislayResult activity
-                Intent resultIntent = new Intent(getActivity(), ResultActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, result);
-                startActivity(resultIntent);
+        public void onPostExecute(String result) {
+            try {
+                JSONObject resultsJson = new JSONObject(result);
+
+                String totItems = resultsJson.getString("resultCount");
+                //check if there were any results and start activity, otherwise, show error dialog
+                if (Integer.parseInt(totItems)!=0) {
+                    //start new dislayResult activity
+                    Intent resultIntent = new Intent(getActivity(), ResultActivity.class)
+                            .putExtra(Intent.EXTRA_TEXT, result);
+                    startActivity(resultIntent);
+                }else{
+                    getActivity().findViewById(R.id.invalid_noResults).setVisibility(View.VISIBLE);
+                }
+
+            }
+            catch(JSONException e){
+                Log.e("Error", e.getMessage());
             }
         }
     }
