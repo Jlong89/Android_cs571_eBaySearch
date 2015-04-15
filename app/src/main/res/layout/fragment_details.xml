@@ -84,6 +84,7 @@
         android:text="SELLER"
         android:layout_below="@+id/details_buyItNowButton"
         android:layout_centerHorizontal="true"
+        android:background="@drawable/details_button_selector"
     />
     <Button android:id="@+id/details_basicInfoButton"
         android:layout_width="140dp"
@@ -92,7 +93,8 @@
         android:text="BASIC INFO"
         android:layout_below="@+id/details_buyItNowButton"
         android:layout_alignParentLeft="true"
-     />
+        android:background="@drawable/details_button_selector"
+    />
 
     <Button android:id="@+id/details_shippingButton"
         android:layout_width="140dp"
@@ -101,6 +103,7 @@
         android:text="SHIPPING"
         android:layout_below="@+id/details_buyItNowButton"
         android:layout_alignParentRight="true"
+        android:background="@drawable/details_button_selector"
         />
 
     <RelativeLayout
@@ -246,7 +249,7 @@
             android:layout_below="@+id/positiveFeedback_label"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:text="Positive Feedback"
+            android:text="Feedback Rating"
             android:paddingTop="15dip"
             android:paddingBottom="15dip"
             android:paddingLeft="15dip"
@@ -277,7 +280,7 @@
             android:id="@+id/details_topRated"
             android:layout_width="50dp"
             android:layout_height="50dp"
-
+            android:layout_marginLeft="5dp"
             android:layout_alignTop="@id/topRated_label"
             android:layout_toRightOf="@id/topRated_label"
             android:paddingTop="15dip"
@@ -290,7 +293,7 @@
             android:layout_below="@+id/topRated_label"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:text="Positive Feedback"
+            android:text="Store"
             android:paddingTop="15dip"
             android:paddingBottom="15dip"
             android:paddingLeft="15dip"
@@ -327,7 +330,7 @@
             android:id="@+id/details_shippingType"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="17dp"
             android:layout_alignTop="@id/shippingType_label"
             android:layout_toRightOf="@id/shippingType_label"
             android:paddingTop="15dip"
@@ -390,7 +393,7 @@
             android:id="@+id/details_expeditedShipping"
             android:layout_width="50dp"
             android:layout_height="50dp"
-
+            android:layout_marginLeft="5dp"
             android:layout_alignTop="@id/expeditedShipping_label"
             android:layout_toRightOf="@id/expeditedShipping_label"
             android:paddingTop="15dip"
@@ -413,7 +416,7 @@
             android:id="@+id/details_oneDayShipping"
             android:layout_width="50dp"
             android:layout_height="50dp"
-
+            android:layout_marginLeft="5dp"
             android:layout_alignTop="@id/oneDayShipping_label"
             android:layout_toRightOf="@id/oneDayShipping_label"
             android:paddingTop="15dip"
@@ -436,6 +439,7 @@
             android:id="@+id/details_returnedAccepted"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_marginLeft="5dp"
             android:layout_alignTop="@id/returnsAccepted_label"
             android:layout_toRightOf="@id/returnsAccepted_label"
             android:paddingTop="15dip"

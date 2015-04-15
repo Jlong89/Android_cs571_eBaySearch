@@ -62,7 +62,6 @@ public class ResultActivity extends ActionBarActivity {
 
         private static final String LOG_TAG = ResultsFragment.class.getSimpleName();
         private String jsonResult;
-
         private ArrayList<String> itemTitleList = new ArrayList<>();
         private ArrayList<String> itemPriceStrList = new ArrayList<>();
         private ArrayList<String> galleryURLList = new ArrayList<>();
@@ -119,9 +118,10 @@ public class ResultActivity extends ActionBarActivity {
                 String itemTitle = basicInfoJsonObj.getString("Title");
                 itemTitleList.add(itemTitle);
 
+                String picURL = (!basicInfoJsonObj.getString("pictureURLSuperSize").equals(""))?basicInfoJsonObj.getString("pictureURLSuperSize"):basicInfoJsonObj.getString("galleryURL");
                 curItem.put("galleryURL", basicInfoJsonObj.getString("galleryURL"));
-                //Drawable itemImg = loadImageFromURL(basicInfoJsonObj.getString("galleryURL"));
-                galleryURLList.add(basicInfoJsonObj.getString("galleryURL"));
+                galleryURLList.add(picURL);
+
                 curItem.put("viewItemURL", basicInfoJsonObj.getString("viewItemURL"));
                 curItem.put("pictureURLSuperSize", basicInfoJsonObj.getString("pictureURLSuperSize"));
                 curItem.put("convertedCurrentPrice", basicInfoJsonObj.getString("convertedCurrentPrice"));
@@ -165,8 +165,5 @@ public class ResultActivity extends ActionBarActivity {
             //Toast.makeText(getActivity(), test, Toast.LENGTH_SHORT).show();
 
         }
-
-
     }
-
 }

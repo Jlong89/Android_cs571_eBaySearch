@@ -44,8 +44,6 @@ public class DetailsActivity extends ActionBarActivity {
                     .add(R.id.container, new DetailsFragment())
                     .commit();
         }
-
-
     }
 
     @Override
@@ -113,7 +111,7 @@ public class DetailsActivity extends ActionBarActivity {
                     }
                 });
 
-                //obtain HashMap with item Info that is passed in intent
+                //obtain HashMap with item Info that is passed in intent from Result Activity
                 Intent intent = getActivity().getIntent();
                 if (intent != null) {
                     itemMap = (HashMap<String, String>)intent.getSerializableExtra("itemInfo");
@@ -129,12 +127,15 @@ public class DetailsActivity extends ActionBarActivity {
                 final Button basicInfoButton = (Button) rootView.findViewById(R.id.details_basicInfoButton);
                 final Button sellerInfoButton = (Button) rootView.findViewById(R.id.details_sellerButton);
                 final Button shippingInfoButton = (Button) rootView.findViewById(R.id.details_shippingButton);
-
+                basicInfoButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.details_button_pressed));
                 //assign buttons actions to panel buttons
                 basicInfoButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        basicInfoButton.setPressed(true);
+
+                        basicInfoButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.details_button_pressed));
+                        sellerInfoButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.details_button_selector));
+                        shippingInfoButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.details_button_selector));
                         basicInfoPane.setVisibility(View.VISIBLE);
                         sellerInfoPane.setVisibility(View.GONE);
                         shippingInfoPane.setVisibility(View.GONE);
@@ -143,6 +144,9 @@ public class DetailsActivity extends ActionBarActivity {
                 sellerInfoButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        sellerInfoButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.details_button_pressed));
+                        shippingInfoButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.details_button_selector));
+                        basicInfoButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.details_button_selector));
                         basicInfoPane.setVisibility(View.GONE);
                         sellerInfoPane.setVisibility(View.VISIBLE);
                         shippingInfoPane.setVisibility(View.GONE);
@@ -151,6 +155,9 @@ public class DetailsActivity extends ActionBarActivity {
                 shippingInfoButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        shippingInfoButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.details_button_pressed));
+                        basicInfoButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.details_button_selector));
+                        sellerInfoButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.details_button_selector));
                         basicInfoPane.setVisibility(View.GONE);
                         sellerInfoPane.setVisibility(View.GONE);
                         shippingInfoPane.setVisibility(View.VISIBLE);
@@ -184,7 +191,7 @@ public class DetailsActivity extends ActionBarActivity {
                 ImageView itemOneDayShipping = (ImageView) rootView.findViewById(R.id.details_oneDayShipping);
                 ImageView itemReturnsAccepted = (ImageView) rootView.findViewById(R.id.details_returnedAccepted);
 
-                //find
+                //find Buy it Now button and FB image and assign clickables to them
                 Button buyNowButton = (Button) rootView.findViewById(R.id.details_buyItNowButton);
 
                 //make 'buy now' button clickable to ebay page of item
@@ -198,7 +205,6 @@ public class DetailsActivity extends ActionBarActivity {
                 });
 
                 ImageView fbIcon = (ImageView) rootView.findViewById(R.id.details_fbIcon);
-
                 fbIcon.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -207,7 +213,7 @@ public class DetailsActivity extends ActionBarActivity {
                 });
 
 
-                //populate views in detail fragment
+                //populate views in detail fragment with info from item info HashMap sent from result Activity via intent
                 DownloadImageTask dlImgTask = new DownloadImageTask(itemBigPic);
                 dlImgTask.setContext(getActivity());
                 String picURL = (!itemMap.get("pictureURLSuperSize").equals(""))?itemMap.get("pictureURLSuperSize"):itemMap.get("galleryURL");
@@ -222,7 +228,12 @@ public class DetailsActivity extends ActionBarActivity {
                 }
 
                 itemCat.setText(itemMap.get("categoryName"));
-                itemCond.setText(itemMap.get("conditionDisplayName"));
+                if(!itemMap.get("conditionDisplayName").equals("")) {
+                    itemCond.setText(itemMap.get("conditionDisplayName"));
+                }else{
+                    itemCond.setText("N/A");
+                }
+
                 itemBuyingFormat.setText(itemMap.get("listingType"));
 
                 itemUserName.setText(itemMap.get("sellerUserName"));
@@ -259,6 +270,9 @@ public class DetailsActivity extends ActionBarActivity {
 
                 return rootView;
             }
+            /*
+                creates share dialog to post on FB
+             */
             private void fbShare(){
                 if (ShareDialog.canShow(ShareLinkContent.class)) {
                     String description = itemMap.get("priceStr") + ", Location: " + itemMap.get("location");
@@ -280,16 +294,9 @@ public class DetailsActivity extends ActionBarActivity {
         }
 
 
-
     /*
-    private static void populateDetails(View rootView){
-        ImageView itemBigPic = (ImageView) rootView.findViewById(R.id.details_itemBigPic);
-        //set big pic for item
-        DownloadImageTask dlImgTask = new DownloadImageTask(imageView);
-        dlImgTask.setContext(getActivity());
-        dlImgTask.execute(imgURL);
-    }*/
-
+        Downloads images from urls in the background
+     */
     private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         private final String LOG_TAG = DownloadImageTask.class.getSimpleName();
         ImageView bmImage;
@@ -314,11 +321,16 @@ public class DetailsActivity extends ActionBarActivity {
                 Log.e(LOG_TAG, e.getMessage());
                 e.printStackTrace();
             }
+
             return mIcon11;
         }
 
         protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
+            if(result!=null) {
+                bmImage.setImageBitmap(result);
+            }else{
+                bmImage.setImageDrawable(mContext.getResources().getDrawable(R.drawable.no_image));
+            }
         }
     }
 }

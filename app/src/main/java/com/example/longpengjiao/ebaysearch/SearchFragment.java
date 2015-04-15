@@ -14,10 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,10 +32,8 @@ public class SearchFragment extends Fragment {
     private String minPrice;
     private String maxPrice;
     private String sortBy;
-
     private float minPriceVal;
     private float maxPriceVal;
-
     private  EditText keywordTextField;
     private EditText minPriceTextField;
     private EditText maxPriceTextField;
@@ -73,19 +69,23 @@ public class SearchFragment extends Fragment {
     // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
     // Inflate the layout for this fragment
-        Button button = (Button) rootView.findViewById(R.id.searchButton);
-        button.setOnClickListener(new View.OnClickListener() {
+        Button searchButton = (Button) rootView.findViewById(R.id.searchButton);
+        searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 checkForm();
             }
         });
-
-
+        Button clearButton = (Button) rootView.findViewById(R.id.clearButton);
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearForm();
+            }
+        });
 
         invalid_noResults = (TextView)rootView.findViewById(R.id.invalid_noResults);
         invalid_noResults.setVisibility(View.GONE);
-
         invalid_keyword_text  =(TextView) rootView.findViewById(R.id.invalid_keywords);
         invalid_keyword_text.setVisibility(View.GONE);
         invalid_minPrice_text  =(TextView) rootView.findViewById(R.id.invalid_minPrice);
@@ -94,8 +94,6 @@ public class SearchFragment extends Fragment {
         invalid_maxPrice_text.setVisibility(View.GONE);
         invalid_min_max_text  =(TextView) rootView.findViewById(R.id.invalid_min_max);
         invalid_min_max_text.setVisibility(View.GONE);
-
-
         return rootView;
     }
 
@@ -109,6 +107,12 @@ public class SearchFragment extends Fragment {
         called when search button is pressed to check valid form fields
      */
     private void checkForm(){
+        invalid_noResults.setVisibility(View.GONE);
+        invalid_keyword_text.setVisibility(View.GONE);
+        invalid_minPrice_text.setVisibility(View.GONE);
+        invalid_maxPrice_text.setVisibility(View.GONE);
+        invalid_min_max_text.setVisibility(View.GONE);
+
         keywordTextField  =(EditText) getActivity().findViewById(R.id.keywords_field);
         keywords = keywordTextField.getText().toString();
        //debug toast Toast.makeText(getActivity(), keywords, Toast.LENGTH_SHORT).show();
@@ -132,11 +136,17 @@ public class SearchFragment extends Fragment {
             Matcher m = p.matcher(minPrice);
             if(!m.matches()){
                 invalid_minPrice_text.setVisibility(View.VISIBLE);
+                if(maxPrice.equals(""))invalid_maxPrice_text.setVisibility(View.GONE);
                 return;
             }else{
                 invalid_minPrice_text.setVisibility(View.GONE);
+                if(maxPrice.equals(""))invalid_maxPrice_text.setVisibility(View.GONE);
             }
+        }else{
+            invalid_minPrice_text.setVisibility(View.GONE);
+            if(maxPrice.equals(""))invalid_maxPrice_text.setVisibility(View.GONE);
         }
+
 
         if(!maxPrice.equals("")){
             Matcher m = p.matcher(maxPrice);
@@ -146,7 +156,10 @@ public class SearchFragment extends Fragment {
             }else{
                 invalid_maxPrice_text.setVisibility(View.GONE);
             }
+        }else{
+            invalid_maxPrice_text.setVisibility(View.GONE);
         }
+
         if(minPrice.length()!=0 && maxPrice.length()!=0) {
             minPriceVal = Float.parseFloat(minPrice);
             maxPriceVal = Float.parseFloat(maxPrice);
@@ -159,14 +172,36 @@ public class SearchFragment extends Fragment {
             }
         }
 
-        makeCall();
+        makeCall();    //method for making http request
     }
 
+
+    /*
+        clears edit boxes and hides all error messages
+     */
+    private void clearForm(){
+        invalid_noResults.setVisibility(View.GONE);
+        invalid_keyword_text.setVisibility(View.GONE);
+        invalid_minPrice_text.setVisibility(View.GONE);
+        invalid_maxPrice_text.setVisibility(View.GONE);
+        invalid_min_max_text.setVisibility(View.GONE);
+        keywordTextField.setText("");
+        minPriceTextField.setText("");
+        maxPriceTextField.setText("");
+    }
+
+    /*
+        call asyncTask to make http request
+     */
     private void makeCall(){
         FetchEbayResults ebayTask = new FetchEbayResults();
         ebayTask.execute();
     }
 
+
+    /*
+        AsyncTask to handle http request to index.php on aws and getting json response back
+     */
 
     public class FetchEbayResults extends AsyncTask<String, Void, String> {
 
@@ -175,8 +210,7 @@ public class SearchFragment extends Fragment {
         @Override
         protected String doInBackground(String... params) {
 
-            //HTTP request to HW9  index.php on amazon
-            HttpURLConnection urlConnection = null;
+            HttpURLConnection urlConnection = null; //HTTP connection to HW9  index.php on amazon
             BufferedReader reader = null;
             try {
                 urlConnection = null;
@@ -217,9 +251,7 @@ public class SearchFragment extends Fragment {
                 if (inputStream == null) {
                     return null;
                 }
-
                 reader = new BufferedReader(new InputStreamReader(inputStream));
-
                 String line;
 
                 while ((line = reader.readLine()) != null) {
@@ -231,7 +263,7 @@ public class SearchFragment extends Fragment {
                 }
 
                 resultsJsonStr = buffer.toString();
-                Log.v(LOG_TAG, "result json string: " + resultsJsonStr);
+                //Log.v(LOG_TAG, "result json string: " + resultsJsonStr);
 
                 return resultsJsonStr;
 
@@ -268,7 +300,6 @@ public class SearchFragment extends Fragment {
                 }else{
                     getActivity().findViewById(R.id.invalid_noResults).setVisibility(View.VISIBLE);
                 }
-
             }
             catch(JSONException e){
                 Log.e("Error", e.getMessage());

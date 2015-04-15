@@ -90,21 +90,29 @@ public class ResultListAdapter extends ArrayAdapter<String> {
         protected Bitmap doInBackground(String... urls) {
             String urldisplay = urls[0];
             itemEbayURL = urls[1];
-
             Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e(LOG_TAG, e.getMessage());
-                e.printStackTrace();
+            if(!urldisplay.equals("")) {
+                try {
+                    InputStream in = new java.net.URL(urldisplay).openStream();
+                    mIcon11 = BitmapFactory.decodeStream(in);
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, e.getMessage());
+                    e.printStackTrace();
+                }
+                return mIcon11;
+            }else{
+                return null;
             }
-            return mIcon11;
+
         }
 
         protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
 
+            if(result!=null) {
+                bmImage.setImageBitmap(result);
+            }else{
+                bmImage.setImageDrawable(context.getResources().getDrawable(R.drawable.no_image));
+            }
             //make image clickable to open ebay webpage of the item
             bmImage.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -116,8 +124,6 @@ public class ResultListAdapter extends ArrayAdapter<String> {
                 }
             });
         }
-
-
     }
 
     /*
