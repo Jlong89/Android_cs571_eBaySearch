@@ -19,12 +19,21 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 
 import java.io.InputStream;
 import java.util.HashMap;
 
 
 public class DetailsActivity extends ActionBarActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +44,8 @@ public class DetailsActivity extends ActionBarActivity {
                     .add(R.id.container, new DetailsFragment())
                     .commit();
         }
+
+
     }
 
     @Override
@@ -63,6 +74,8 @@ public class DetailsActivity extends ActionBarActivity {
      * A placeholder fragment containing a simple view.
      */
         public static class DetailsFragment extends Fragment {
+            CallbackManager callbackManager;
+            ShareDialog shareDialog;
             HashMap<String, String> itemMap;
 
             public DetailsFragment() {
@@ -71,7 +84,36 @@ public class DetailsActivity extends ActionBarActivity {
             @Override
             public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                      Bundle savedInstanceState) {
+
                 View rootView = inflater.inflate(R.layout.fragment_details, container, false);
+                rootView.setBackgroundColor(getResources().getColor(android.R.color.white));
+                //initialize facebook sdk
+                FacebookSdk.sdkInitialize(getActivity());
+                callbackManager = CallbackManager.Factory.create();  //callback used to handle response from post
+                shareDialog = new ShareDialog(this);
+                // this part is optional
+                shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+
+                    @Override
+                    public void onSuccess(Sharer.Result Result){
+                        String res = Result.toString();
+                        int i=0;
+                        while(res.charAt(i)!='@') i++;
+                        String ID = res.substring(i+1, res.length());
+                        Toast.makeText(getActivity(), "Posted Story, ID:"+ID, Toast.LENGTH_SHORT).show();
+                    }
+                    @Override
+                    public void onCancel(){
+                        Toast.makeText(getActivity(), "Post Cancelled", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(FacebookException error){
+
+                    }
+                });
+
+                //obtain HashMap with item Info that is passed in intent
                 Intent intent = getActivity().getIntent();
                 if (intent != null) {
                     itemMap = (HashMap<String, String>)intent.getSerializableExtra("itemInfo");
@@ -142,8 +184,8 @@ public class DetailsActivity extends ActionBarActivity {
                 ImageView itemOneDayShipping = (ImageView) rootView.findViewById(R.id.details_oneDayShipping);
                 ImageView itemReturnsAccepted = (ImageView) rootView.findViewById(R.id.details_returnedAccepted);
 
+                //find
                 Button buyNowButton = (Button) rootView.findViewById(R.id.details_buyItNowButton);
-
 
                 //make 'buy now' button clickable to ebay page of item
                 buyNowButton.setOnClickListener(new View.OnClickListener() {
@@ -152,6 +194,15 @@ public class DetailsActivity extends ActionBarActivity {
                         Intent i = new Intent(Intent.ACTION_VIEW);
                         i.setData(Uri.parse(itemMap.get("viewItemURL")));
                         getActivity().startActivity(i);
+                    }
+                });
+
+                ImageView fbIcon = (ImageView) rootView.findViewById(R.id.details_fbIcon);
+
+                fbIcon.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        fbShare();
                     }
                 });
 
@@ -208,7 +259,28 @@ public class DetailsActivity extends ActionBarActivity {
 
                 return rootView;
             }
+            private void fbShare(){
+                if (ShareDialog.canShow(ShareLinkContent.class)) {
+                    String description = itemMap.get("priceStr") + ", Location: " + itemMap.get("location");
+                    ShareLinkContent content = new ShareLinkContent.Builder()
+                            .setContentTitle((itemMap.get("title")))
+                            .setContentUrl(Uri.parse(itemMap.get("viewItemURL")))
+                            .setImageUrl(Uri.parse(itemMap.get("galleryURL")))
+                            .setContentDescription(description)
+                            .build();
+                    shareDialog.show(content);
+                }
+            }
+
+            @Override
+            public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                super.onActivityResult(requestCode, resultCode, data);
+                callbackManager.onActivityResult(requestCode, resultCode, data);
+            }
         }
+
+
+
     /*
     private static void populateDetails(View rootView){
         ImageView itemBigPic = (ImageView) rootView.findViewById(R.id.details_itemBigPic);

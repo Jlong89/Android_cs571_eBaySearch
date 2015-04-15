@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From: file:/Users/longpengjiao/AndroidStudioProjects/CS571/CS571_HW9/eBaySearch/facebook/build/intermediates/bundles/debug/res/values-mr/values.xml -->
+    <eat-comment/>
+    <string name="messenger_send_button_text">पाठवा</string>
+</resources>

@@ -77,6 +77,7 @@ public class ResultActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_result, container, false);
+            rootView.setBackgroundColor(getResources().getColor(android.R.color.white));
             try {
                 Intent intent = getActivity().getIntent();
                 if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {

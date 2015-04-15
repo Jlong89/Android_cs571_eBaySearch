@@ -62,6 +62,7 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_search, container, false);
+        rootView.setBackgroundColor(getResources().getColor(android.R.color.white));
 
         Spinner spinner = (Spinner) rootView.findViewById(R.id.sortBy_spinner);
     // Create an ArrayAdapter using the string array and a default spinner layout
@@ -173,7 +174,7 @@ public class SearchFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... params) {
-            
+
             //HTTP request to HW9  index.php on amazon
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
