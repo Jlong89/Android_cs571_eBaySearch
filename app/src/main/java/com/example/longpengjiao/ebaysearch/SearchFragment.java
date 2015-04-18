@@ -1,5 +1,6 @@
 package com.example.longpengjiao.ebaysearch;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -14,8 +15,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +46,8 @@ public class SearchFragment extends Fragment {
     private TextView invalid_maxPrice_text;
     private TextView invalid_min_max_text;
     private Pattern p = Pattern.compile("^(\\d+)?(\\.\\d+)?$");
+    private ProgressDialog progress = null;
+
 
     public SearchFragment() {
         // Required empty public constructor
@@ -101,6 +106,14 @@ public class SearchFragment extends Fragment {
     }
 
     @Override
+    public void onStart(){
+        super.onStart();
+        progress = new ProgressDialog(getActivity());
+        progress.setTitle("Loading");
+        progress.setMessage("Fetching from eBay...");
+    }
+
+    @Override
     public void onResume(){
         super.onResume();
         invalid_noResults.setVisibility(View.GONE);
@@ -110,6 +123,7 @@ public class SearchFragment extends Fragment {
         called when search button is pressed to check valid form fields
      */
     private void checkForm(){
+
         invalid_noResults.setVisibility(View.GONE);
         invalid_keyword_text.setVisibility(View.GONE);
         invalid_minPrice_text.setVisibility(View.GONE);
@@ -199,6 +213,8 @@ public class SearchFragment extends Fragment {
     private void makeCall(){
         FetchEbayResults ebayTask = new FetchEbayResults();
         ebayTask.execute();
+
+        progress.show();
     }
 
 
@@ -290,15 +306,20 @@ public class SearchFragment extends Fragment {
 
         @Override
         public void onPostExecute(String result) {
+            progress.dismiss();
             try {
                 JSONObject resultsJson = new JSONObject(result);
 
                 String totItems = resultsJson.getString("resultCount");
+
                 //check if there were any results and start activity, otherwise, show error dialog
                 if (Integer.parseInt(totItems)!=0) {
                     //start new dislayResult activity
+                    Bundle extras = new Bundle();
+                    extras.putString("jsonResultStr", result);
+                    extras.putString("keywords",keywordTextField.getText().toString());
                     Intent resultIntent = new Intent(getActivity(), ResultActivity.class)
-                            .putExtra(Intent.EXTRA_TEXT, result);
+                            .putExtras(extras);
                     startActivity(resultIntent);
                 }else{
                     getActivity().findViewById(R.id.invalid_noResults).setVisibility(View.VISIBLE);

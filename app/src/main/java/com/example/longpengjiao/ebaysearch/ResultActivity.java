@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,6 +67,7 @@ public class ResultActivity extends ActionBarActivity {
         private ArrayList<String> itemPriceStrList = new ArrayList<>();
         private ArrayList<String> galleryURLList = new ArrayList<>();
         private String shippingCost=null;
+        private String keywords=null;
 
         //collect json results into arraylist, each element contains item information
         private ArrayList<HashMap<String, String>> items = new ArrayList<>();
@@ -79,12 +81,18 @@ public class ResultActivity extends ActionBarActivity {
             rootView.setBackgroundColor(getResources().getColor(android.R.color.white));
             try {
                 Intent intent = getActivity().getIntent();
-                if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-                    jsonResult = intent.getStringExtra(Intent.EXTRA_TEXT);
+                if (intent != null) {
+                    Bundle extras = intent.getExtras();
+                    //jsonResult = intent.getStringExtra(Intent.EXTRA_TEXT);
+                    jsonResult = extras.getString("jsonResultStr");
+                    keywords = extras.getString("keywords");
                 }
                 //obtain results from JSON
                 getResultsFromJson(jsonResult);
                 //set the custom adapter to populate the results listview
+                String resultTitleStr = "Results for '" + keywords +"'";
+                TextView resultTitleText = (TextView) rootView.findViewById(R.id.resultsTitle);
+                resultTitleText.setText(resultTitleStr);
                 ResultListAdapter resultAdapter=new ResultListAdapter(getActivity(),itemTitleList,galleryURLList,itemPriceStrList,items);
                 ListView resultList= (ListView) rootView.findViewById(R.id.result_list);
                 resultList.setAdapter(resultAdapter);
@@ -161,7 +169,7 @@ public class ResultActivity extends ActionBarActivity {
                 items.add(curItem);
             }
 
-             String test = items.get(4).get("location");
+             //String test = items.get(4).get("location");
             //Toast.makeText(getActivity(), test, Toast.LENGTH_SHORT).show();
 
         }
