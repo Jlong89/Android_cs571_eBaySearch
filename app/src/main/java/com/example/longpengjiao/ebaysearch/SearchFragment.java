@@ -42,7 +42,7 @@ public class SearchFragment extends Fragment {
     private TextView invalid_minPrice_text;
     private TextView invalid_maxPrice_text;
     private TextView invalid_min_max_text;
-    private Pattern p = Pattern.compile("^\\d+(\\.\\d+)?$");
+    private Pattern p = Pattern.compile("^(\\d+)?(\\.\\d+)?$");
 
     public SearchFragment() {
         // Required empty public constructor
@@ -60,6 +60,9 @@ public class SearchFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_search, container, false);
         rootView.setBackgroundColor(getResources().getColor(android.R.color.white));
 
+        keywordTextField  =(EditText) rootView.findViewById(R.id.keywords_field);
+        minPriceTextField  =(EditText) rootView.findViewById(R.id.minPrice_field);
+        maxPriceTextField  =(EditText) rootView.findViewById(R.id.maxPrice_field);
         Spinner spinner = (Spinner) rootView.findViewById(R.id.sortBy_spinner);
     // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
@@ -112,13 +115,11 @@ public class SearchFragment extends Fragment {
         invalid_minPrice_text.setVisibility(View.GONE);
         invalid_maxPrice_text.setVisibility(View.GONE);
         invalid_min_max_text.setVisibility(View.GONE);
-
-        keywordTextField  =(EditText) getActivity().findViewById(R.id.keywords_field);
         keywords = keywordTextField.getText().toString();
        //debug toast Toast.makeText(getActivity(), keywords, Toast.LENGTH_SHORT).show();
-        minPriceTextField  =(EditText) getActivity().findViewById(R.id.minPrice_field);
+
         minPrice = minPriceTextField.getText().toString();
-        maxPriceTextField  =(EditText) getActivity().findViewById(R.id.maxPrice_field);
+
         maxPrice = maxPriceTextField.getText().toString();
         Spinner mySpinner= (Spinner) getActivity().findViewById(R.id.sortBy_spinner);
         sortBy = mySpinner.getSelectedItem().toString();
@@ -188,6 +189,8 @@ public class SearchFragment extends Fragment {
         keywordTextField.setText("");
         minPriceTextField.setText("");
         maxPriceTextField.setText("");
+        Spinner sortSpinner = (Spinner)getActivity().findViewById(R.id.sortBy_spinner);
+        sortSpinner.setSelection(((ArrayAdapter<CharSequence>)sortSpinner.getAdapter()).getPosition("Best Match"));
     }
 
     /*
