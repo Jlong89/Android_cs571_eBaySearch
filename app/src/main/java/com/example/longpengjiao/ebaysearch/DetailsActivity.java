@@ -95,10 +95,13 @@ public class DetailsActivity extends ActionBarActivity {
                     @Override
                     public void onSuccess(Sharer.Result Result){
                         String res = Result.toString();
-                        int i=0;
-                        while(res.charAt(i)!='@') i++;
-                        String ID = res.substring(i+1, res.length());
-                        Toast.makeText(getActivity(), "Posted Story, ID:"+ID, Toast.LENGTH_SHORT).show();
+                        String ID = Result.getPostId();
+                        if(ID!=null) {
+                            Toast.makeText(getActivity(), "Posted Story, ID:" + ID, Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            Toast.makeText(getActivity(), "Post Cancelled", Toast.LENGTH_SHORT).show();
+                        }
                     }
                     @Override
                     public void onCancel(){
